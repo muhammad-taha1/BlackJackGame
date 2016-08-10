@@ -50,9 +50,10 @@ namespace BlackJackConsole
 
                 else
                 {
-                    round.player.stay();
-                    Console.WriteLine("players hand: " + round.player.getHand());
-                    Console.WriteLine(round.player.getHandValue());
+                    // player calls stay
+                    round.dealer.turnAllCardsFaceUp();
+                    Console.WriteLine("dealers hand: " + round.dealer.getHand());
+                    Console.WriteLine(round.dealer.getHandValue());
 
                 }
             }

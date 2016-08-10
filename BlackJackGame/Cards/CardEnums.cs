@@ -10,10 +10,10 @@ namespace BlackJackGame.Cards
     {
         public enum Suit
         {
-            Hearts,
+            Clubs,
             Spades,
+            Hearts,
             Diamonds,
-            Clubs
         };
 
         public enum Value

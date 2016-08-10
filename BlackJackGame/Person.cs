@@ -71,18 +71,15 @@ namespace BlackJackGame
             }
         }
 
-        public void stay()
+        public void turnAllCardsFaceUp()
         {
-            if (isPlayer)
+            foreach (Card card in hand)
             {
-                foreach (Card card in hand)
+                if (!card.isFaceUp)
                 {
-                    if (!card.isFaceUp)
-                    {
-                        card.turnCardOver();
-                    }
+                    card.turnCardOver();
                 }
-            }
+            }    
         }
 
 

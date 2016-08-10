@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlackJackGame.CardImgs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,13 +20,17 @@ namespace BlackJackGame.Cards
         private void formNewDeck()
         {
             int cardCnt = 0;
+            int suitCount = 0;
             foreach (string suit in Enum.GetNames(typeof(CardEnums.Suit)))
             {
+                int valueCount = 0;
                 foreach (string value in Enum.GetNames(typeof(CardEnums.Value)))
                 {
-                    deck[cardCnt] = new Card(suit, value);
+                    deck[cardCnt] = new Card(suit, value, ImageParser.getImage(valueCount, suitCount));
+                    valueCount++;
                     cardCnt++;
                 }
+                suitCount++;
             }
         }
 

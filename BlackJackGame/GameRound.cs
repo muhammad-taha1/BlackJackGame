@@ -23,8 +23,8 @@ namespace BlackJackGame
 
             // deal cards
             player.hand.Add(deck.dealFaceUp());
-            dealer.hand.Add(deck.dealFaceUp());
-            player.hand.Add(deck.deal());
+            dealer.hand.Add(deck.deal());
+            player.hand.Add(deck.dealFaceUp());
             dealer.hand.Add(deck.dealFaceUp());
 
           
