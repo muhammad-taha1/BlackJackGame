@@ -5,9 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackJackGame"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Background="DarkGreen">
+        Title="MainWindow" Height="591.018" Width="967.216" Background="DarkGreen">
+    <Window.Resources>
+        <Storyboard x:Key="dealAnimation">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="deckAnimation">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.6" Value="138"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource dealAnimation}"/>
+        </EventTrigger>
+    </Window.Triggers>
     <Grid>
-        <Image x:Name="image" HorizontalAlignment="Left" Height="100" Margin="27,28,0,0" VerticalAlignment="Top" Width="100"/>
+        <StackPanel x:Name="dealerHand" HorizontalAlignment="Left" Height="123" VerticalAlignment="Top" Width="759" ScrollViewer.CanContentScroll="True" Orientation="Horizontal" Margin="90,44,0,0"/>
+        <StackPanel x:Name="playerHand" HorizontalAlignment="Left" Height="124" VerticalAlignment="Top" Width="759" ScrollViewer.CanContentScroll="True" Orientation="Horizontal" Margin="90,346,0,0"/>
+        <Button x:Name="hit" Content="Hit" HorizontalAlignment="Left" Margin="218,493,0,0" VerticalAlignment="Top" Width="75" Foreground="#FFFF0B0B" Background="Black" FontWeight="Bold" Click="hit_Click"/>
+        <Button x:Name="stay" Content="Stay" HorizontalAlignment="Left" Margin="593,493,0,0" VerticalAlignment="Top" Width="75" Background="Black" Foreground="Red" FontWeight="Bold" Click="stay_Click"/>
+        <TextBlock x:Name="playerScore" HorizontalAlignment="Left" Margin="10,370,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="69" FontWeight="Bold" TextAlignment="Center" FontSize="24"/>
+        <TextBlock x:Name="dealerScore" HorizontalAlignment="Left" Margin="10,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="69" FontWeight="Bold" TextAlignment="Center" FontSize="24"/>
+        <TextBlock x:Name="dealerMoney" HorizontalAlignment="Left" Margin="854,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="69" FontWeight="Bold" TextAlignment="Center" FontSize="24"/>
+        <TextBlock x:Name="playerMoney" HorizontalAlignment="Left" Margin="849,370,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="69" FontWeight="Bold" TextAlignment="Center" FontSize="24"/>
+        <Rectangle x:Name="deckAnimation" Margin="419,215.5,440.216,244.518" Stroke="Black" Height="90" Width="75" RenderTransformOrigin="0.5,0.5">
+            <Rectangle.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Rectangle.RenderTransform>
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="back.jpg"/>
+            </Rectangle.Fill>
+        </Rectangle>
 
     </Grid>
 </Window>

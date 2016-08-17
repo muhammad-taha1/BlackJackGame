@@ -14,7 +14,6 @@ namespace BlackJackGame
         public bool bustFlag { get; private set; }
 
         public bool isPlayer { get; private set; }
-        public int score { get; set; }
 
         public Person(String aName, bool aIsPlayer)
         {
@@ -63,12 +62,15 @@ namespace BlackJackGame
             return handDescription;
         }
 
-        public void hit(DeckOfCards deck)
+        public Card hit(DeckOfCards deck)
         {
+            Card c = null;
             if (isPlayer)
             {
-                hand.Add(deck.dealFaceUp());
+                c = deck.dealFaceUp();
+                hand.Add(c);
             }
+            return c;
         }
 
         public void turnAllCardsFaceUp()
@@ -80,6 +82,16 @@ namespace BlackJackGame
                     card.turnCardOver();
                 }
             }    
+        }
+
+        public void disposeHand()
+        {
+            foreach (Card c in hand)
+            {
+                c.cardFaceImage.Dispose();
+            }
+
+            hand = new List<Card>();
         }
 
 

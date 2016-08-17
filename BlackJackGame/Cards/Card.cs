@@ -13,7 +13,7 @@ namespace BlackJackGame.Cards
         public CardEnums.Value cardValue { get; private set; }
         public bool isFaceUp { get; private set; }
         public Bitmap cardFaceImage { get; private set; }
-        public Bitmap cardBackImage { get; private set; }
+        public string cardBackImage { get; private set; }
 
         public Card(CardEnums.Suit s, CardEnums.Value v, Bitmap image)
         {
@@ -21,7 +21,7 @@ namespace BlackJackGame.Cards
             cardValue = v;
             isFaceUp = false;
             cardFaceImage = image;
-            cardBackImage = new Bitmap("C:/Users/Muhammad Taha/Documents/Visual Studio 2015/Projects/BlackJackGame/BlackJackGame/CardImgs/back.jpg");
+            cardBackImage = "C:/Users/Muhammad Taha/Documents/Visual Studio 2015/Projects/BlackJackGame/BlackJackGame/CardImgs/back.jpg";
         }
 
         public Card(string s, string v, Bitmap image)
@@ -30,7 +30,7 @@ namespace BlackJackGame.Cards
             cardValue = (CardEnums.Value)Enum.Parse(typeof(CardEnums.Value), v);
             isFaceUp = false;
             cardFaceImage = image;
-            cardBackImage = new Bitmap("C:/Users/Muhammad Taha/Documents/Visual Studio 2015/Projects/BlackJackGame/BlackJackGame/CardImgs/back.jpg");
+            cardBackImage = "C:/Users/Muhammad Taha/Documents/Visual Studio 2015/Projects/BlackJackGame/BlackJackGame/CardImgs/back.jpg";
         }
 
 

@@ -56,7 +56,7 @@ namespace BlackJackGame.Cards
             List<Card> bottomHalf = new List<Card>();
 
             Random r = new Random();
-            int cutPoint = r.Next(10, deck.Count());
+            int cutPoint = r.Next(1, deck.Count());
 
             for (int i = 0; i < cutPoint; i++)
             {
