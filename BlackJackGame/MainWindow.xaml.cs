@@ -219,8 +219,20 @@ namespace BlackJackGame
             } 
             else
             {
-                hit.IsEnabled = false;
-                stay.IsEnabled = false;
+                var newGame = MessageBox.Show("Continue game with new deck?", "Game Over", MessageBoxButton.YesNo);
+
+                switch (newGame)
+                {
+                    case (MessageBoxResult.Yes):
+                        deck = new DeckOfCards();
+                        dealInitialCards();
+                        updateHandScore();
+                        break;
+                    case (MessageBoxResult.No):
+                        hit.IsEnabled = false;
+                        stay.IsEnabled = false;
+                        break;
+                }
             }
 
         }

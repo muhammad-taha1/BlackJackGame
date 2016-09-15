@@ -14,6 +14,7 @@ namespace BlackJackGame.Cards
         public bool isFaceUp { get; private set; }
         public Bitmap cardFaceImage { get; private set; }
         public string cardBackImage { get; private set; }
+        public int priority; // used by AI for dada game
 
         public Card(CardEnums.Suit s, CardEnums.Value v, Bitmap image)
         {
@@ -33,6 +34,15 @@ namespace BlackJackGame.Cards
             cardBackImage = "C:/Users/Muhammad Taha/Documents/Visual Studio 2015/Projects/BlackJackGame/BlackJackGame/CardImgs/back.jpg";
         }
 
+        // for testing only!
+        public Card(CardEnums.Suit s, CardEnums.Value v)
+        {
+            cardSuit = s;
+            cardValue = v;
+            isFaceUp = false;
+            cardFaceImage = null;
+            cardBackImage = "C:/Users/Muhammad Taha/Documents/Visual Studio 2015/Projects/BlackJackGame/BlackJackGame/CardImgs/back.jpg";
+        }
 
         public int getCardScore()
         {
@@ -74,6 +84,54 @@ namespace BlackJackGame.Cards
         public override string ToString()
         {
             return (cardValue.ToString() + " of " + cardSuit.ToString());
+        }
+
+        public string shortString()
+        {
+            string cardVal = "";
+            switch (cardValue.ToString())
+            {
+                case ("Ace"):
+                    cardVal = "A";
+                    break;
+                case ("Two"):
+                    cardVal = "2";
+                    break;
+                case ("Three"):
+                    cardVal = "3";
+                    break;
+                case ("Four"):
+                    cardVal = "4";
+                    break;
+                case ("Five"):
+                    cardVal = "5";
+                    break;
+                case ("Six"):
+                    cardVal = "6";
+                    break;
+                case ("Seven"):
+                    cardVal = "7";
+                    break;
+                case ("Eight"):
+                    cardVal = "8";
+                    break;
+                case ("Nine"):
+                    cardVal = "9";
+                    break;
+                case ("Ten"):
+                    cardVal = "10";
+                    break;
+                case ("Jack"):
+                    cardVal = "J";
+                    break;
+                case ("Queen"):
+                    cardVal = "Q";
+                    break;
+                case ("King"):
+                    cardVal = "K";
+                    break;
+            }
+            return (cardVal + cardSuit.ToString().ElementAt(0));
         }
     }
 }
