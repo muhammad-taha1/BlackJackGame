@@ -19,7 +19,7 @@ namespace DadaGame
     public partial class MainWindow : Window
     {
         private DeckOfCards deck;
-      //  private Person dealer;
+        //  private Person dealer;
         private Person player;
         private int faceup = 0;
         private int lastClick = 0;
@@ -35,7 +35,7 @@ namespace DadaGame
             InitializeComponent();
 
             // create players and deal initial cards
-           // dealer = new Person("dealer", false);
+            // dealer = new Person("dealer", false);
             player = new Person("player", true);
 
             dealersAI = new AI();
@@ -207,6 +207,35 @@ namespace DadaGame
                 dealersAI.topTableCard = c;
                 dealersAI.CardsDealt.Add(c);
                 Card dealersEjectedCard = dealersAI.MakeDecision(deck);
+
+                // AI has won. TODO: see if this logic can be improved
+                if (dealersEjectedCard == null)
+                {
+                    dealerHand.Children.RemoveRange(0, dealerHand.Children.Count);
+                    // display winning cards in a nice fashion
+                    foreach (List<Card> group in dealersAI.sameSuitCards)
+                    {
+                        Group isWinningGroup = new Group();
+                        isWinningGroup.cardsInGroup = group;
+                        if (isWinningGroup.checkIfGroupValid())
+                        {
+                            addCardListToHand(dealerHand, group);
+                        }
+                    }
+
+                    foreach (List<Card> group in dealersAI.sameValueCards)
+                    {
+                        Group isWinningGroup = new Group();
+                        isWinningGroup.cardsInGroup = group;
+                        if (isWinningGroup.checkIfGroupValid())
+                        {
+                            addCardListToHand(dealerHand, group);
+                        }
+                    }
+
+                    return;
+
+                }
                 updateHandImage(dealersAI.dealersHand, dealerHand);
 
                 tableCards.Push(dealersEjectedCard);
@@ -393,6 +422,14 @@ namespace DadaGame
         private void addCardImageToHand(StackPanel hand, Card newCard)
         {
             hand.Children.Add(constructCardImage(newCard));
+        }
+
+        private void addCardListToHand(StackPanel hand, List<Card> cardList)
+        {
+            foreach (Card c in cardList)
+            {
+                hand.Children.Add(constructCardImage(c));
+            }
         }
     }
 }

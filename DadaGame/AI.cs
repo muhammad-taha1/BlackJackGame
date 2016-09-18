@@ -1,4 +1,5 @@
 ﻿using BlackJackGame.Cards;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace DadaGame
         public Card topTableCard { get; set; }
         public List<Card> CardsDealt { get; set; }
         private int cardCount { get; set; }
+        private static Logger logger;
 
         public AI()
         {
@@ -24,8 +26,10 @@ namespace DadaGame
             sameSuitCards = new List<List<Card>>();
             sameValueCards = new List<List<Card>>();
             CardsDealt = new List<Card>(); // add to this list from xaml.cs, whenever a card is dealt on table
-            // update topTableCard as well
-            // update card count as well
+                                           // update topTableCard as well
+                                           // update card count as well
+            LogManager.ThrowExceptions = true;
+            logger = LogManager.GetCurrentClassLogger();
         }
 
         // Program operates on the fact that the current turn is performed by AI.
@@ -55,8 +59,42 @@ namespace DadaGame
 
         public Card MakeDecision(DeckOfCards deck)
         {
+
+            logger.Trace("**** Starting to Make a decision....");
+            logger.Trace("topTabled card = " + topTableCard.ToString());
+
             DissectHand();
             AssignPrioritiesToCards();
+            logger.Trace("dealer's hand with priorities:");
+            foreach (Card c in dealersHand)
+            {
+                logger.Trace(c.ToString() + ", priority = " + c.priority);
+            }
+
+            logger.Trace("sameValueCardsGroups:");
+            foreach (List<Card> group in sameValueCards)
+            {
+                logger.Trace("----group start------");
+                foreach (Card c in group)
+                {
+                    logger.Trace(c.ToString() + ", priority = " + c.priority);
+                }
+                logger.Trace("----group end------");
+            }
+            logger.Trace("");
+
+            logger.Trace("sameSuitCardsGroups:");
+            foreach (List<Card> group in sameSuitCards)
+            {
+                logger.Trace("----group start------");
+                foreach (Card c in group)
+                {
+                    logger.Trace(c.ToString() + ", priority = " + c.priority);
+                }
+                logger.Trace("----group end------");
+            }
+
+
 
             if (!ShouldKeepTopTableCard())
             {
@@ -72,6 +110,7 @@ namespace DadaGame
             if (checkWin())
             {
                 MessageBox.Show("AI won!");
+                return null;
             }
 
             // eject card with min priority    
@@ -86,11 +125,13 @@ namespace DadaGame
             sameSuitCards = new List<List<Card>>();
             sameValueCards = new List<List<Card>>();
 
+            logger.Trace("min priority card = " + minPriorityCard.ToString() + ", priority = " + minPriorityCard.priority);
             return minPriorityCard;
         }
 
         private bool checkWin()
         {
+            logger.Trace("Checking for win...");
             int groupsOfThree = 0;
             int groupsOfFour = 0;
 
@@ -98,12 +139,22 @@ namespace DadaGame
             {
                 if (group.Count == 3)
                 {
+                    logger.Trace("group of three found! groupsOfThree = " + groupsOfThree);
+                    foreach (Card c in group)
+                    {
+                        logger.Trace(c.ToString() + ", priority = " + c.priority);
+                    }
                     groupsOfThree++;
                     continue;
                 }
 
                 if (group.Count == 4)
                 {
+                    logger.Trace("group of four found! groupsOfFour = " + groupsOfFour);
+                    foreach (Card c in group)
+                    {
+                        logger.Trace(c.ToString() + ", priority = " + c.priority);
+                    }
                     groupsOfFour++;
                     continue;
                 }
@@ -118,14 +169,63 @@ namespace DadaGame
             {
                 if (group.Count == 3 && GroupInNumericOrder(group))
                 {
+                    logger.Trace("group of three found! groupsOfThree = " + groupsOfThree);
+                    foreach (Card c in group)
+                    {
+                        logger.Trace(c.ToString() + ", priority = " + c.priority);
+                    }
                     groupsOfThree++;
                     continue;
                 }
 
-                if (group.Count == 4 && GroupInNumericOrder(group))
+                if (group.Count == 4)
                 {
-                    groupsOfFour++;
-                    continue;
+                    if (GroupInNumericOrder(group))
+                    {
+                        logger.Trace("group of four found! groupsOfFour = " + groupsOfFour);
+                        foreach (Card c in group)
+                        {
+                            logger.Trace(c.ToString() + ", priority = " + c.priority);
+                        }
+                        groupsOfFour++;
+                        continue;
+                    }
+
+                    // check if groups of 4 can form a valid group of 3, only if groupsOfThree < 2
+                    if (groupsOfThree < 2)
+                    {
+                        // see if 3 cards from this group forms a group of 3
+                        List<Card> groupToTest = group.OrderBy(card => card.cardValue).ToList();
+                        Card lastCardCopy = groupToTest.ElementAt(3);
+                        groupToTest.RemoveAt(3);
+
+                        logger.Trace("checking for group after removing last card from group of 4");
+                        if (GroupInNumericOrder(groupToTest))
+                        {
+                            logger.Trace("group of three found! groupsOfThree = " + groupsOfThree);
+                            foreach (Card c in groupToTest)
+                            {
+                                logger.Trace(c.ToString() + ", priority = " + c.priority);
+                            }
+                            groupsOfThree++;
+                            continue;
+                        }
+
+                        // now check after removing first card
+                        logger.Trace("checking for group after removing first card from group of 4");
+                        groupToTest.Add(lastCardCopy);
+                        groupToTest.RemoveAt(0);
+                        if (GroupInNumericOrder(groupToTest))
+                        {
+                            logger.Trace("group of three found! groupsOfThree = " + groupsOfThree);
+                            foreach (Card c in groupToTest)
+                            {
+                                logger.Trace(c.ToString() + ", priority = " + c.priority);
+                            }
+                            groupsOfThree++;
+                            continue;
+                        }
+                    }
                 }
             }
 
@@ -178,7 +278,9 @@ namespace DadaGame
                 //check for win incase
                 if (checkWin())
                 {
-                    MessageBox.Show("AI won!");
+                    // MessageBox.Show("AI won!");
+                    // if we win, then definitely keep the top card
+                    return true;
                 }
 
                 dealersHand.Remove(topTableCard);
