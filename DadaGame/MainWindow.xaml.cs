@@ -19,7 +19,7 @@ namespace DadaGame
     public partial class MainWindow : Window
     {
         private DeckOfCards deck;
-        private Person dealer;
+      //  private Person dealer;
         private Person player;
         private int faceup = 0;
         private int lastClick = 0;
@@ -28,16 +28,20 @@ namespace DadaGame
         private List<Group> submittedGroups;
         private Stack<Card> tableCards;
         private bool isSwapping;
+        private AI dealersAI;
 
         public MainWindow()
         {
             InitializeComponent();
 
             // create players and deal initial cards
-            dealer = new Person("dealer", false);
+           // dealer = new Person("dealer", false);
             player = new Person("player", true);
 
+            dealersAI = new AI();
+
             dealInitialCards();
+            //dealersAI.MakeDecision(deck);
             possibleGroup = new Group();
             validGroup = new Group();
             tableCards = new Stack<Card>();
@@ -58,13 +62,13 @@ namespace DadaGame
             //deal 10 cards to each player. Dealer will be AI here
             for (int i = 0; i < 10; i++)
             {
-                dealer.hand.Add(deck.dealFaceUp());
+                dealersAI.dealersHand.Add(deck.dealFaceUp());
                 player.hand.Add(deck.dealFaceUp());
             }
 
             // update image stacks for each player
-            addEntireHandImage(dealer, dealerHand);
-            addEntireHandImage(player, playerHand);
+            addEntireHandImage(dealersAI.dealersHand, dealerHand);
+            addEntireHandImage(player.hand, playerHand);
         }
 
         /// <summary>
@@ -197,6 +201,17 @@ namespace DadaGame
                 tableCardsTopImg.Source = constructCardImageForTable(tableCards.Peek()).Source;
                 // disable swapping once a swap has been successful
                 isSwapping = false;
+
+                // as soon as card is removed from group, its AI's turn
+                /// *** AI TURN **** ///
+                dealersAI.topTableCard = c;
+                dealersAI.CardsDealt.Add(c);
+                Card dealersEjectedCard = dealersAI.MakeDecision(deck);
+                updateHandImage(dealersAI.dealersHand, dealerHand);
+
+                tableCards.Push(dealersEjectedCard);
+                tableCardsTopImg.Source = constructCardImageForTable(tableCards.Peek()).Source;
+
             }
 
             lastClick = e.Timestamp;
@@ -276,11 +291,22 @@ namespace DadaGame
         }
 
         // add card's image to a player's stack
-        private void addEntireHandImage(Person person, StackPanel hand)
+        private void addEntireHandImage(List<Card> hand, StackPanel handPanel)
         {
-            foreach (Card c in person.hand)
+            foreach (Card c in hand)
             {
-                hand.Children.Add(constructCardImage(c));
+                handPanel.Children.Add(constructCardImage(c));
+                faceup++;
+            }
+        }
+
+        private void updateHandImage(List<Card> hand, StackPanel handPanel)
+        {
+            handPanel.Children.RemoveRange(0, handPanel.Children.Count);
+
+            foreach (Card c in hand)
+            {
+                handPanel.Children.Add(constructCardImage(c));
                 faceup++;
             }
         }

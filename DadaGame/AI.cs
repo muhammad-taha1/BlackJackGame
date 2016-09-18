@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DadaGame
 {
@@ -13,7 +14,7 @@ namespace DadaGame
         public List<List<Card>> sameValueCards { get; private set; } // each list within is collection cards with same value
         public List<List<Card>> sameSuitCards { get; private set; } // each list within is collection cards with same suit
         public Card topTableCard { get; set; }
-        private List<Card> CardsDealt { get; set; }
+        public List<Card> CardsDealt { get; set; }
         private int cardCount { get; set; }
 
         public AI()
@@ -52,9 +53,143 @@ namespace DadaGame
         //  deal card from deck and discard card with lowest priority
 
 
-        public void MakeDecision()
+        public Card MakeDecision(DeckOfCards deck)
         {
+            DissectHand();
+            AssignPrioritiesToCards();
 
+            if (!ShouldKeepTopTableCard())
+            {
+                // take card from deck
+                sameSuitCards = new List<List<Card>>();
+                sameValueCards = new List<List<Card>>();
+                dealersHand.Add(deck.dealFaceUp());
+                DissectHand();
+                AssignPrioritiesToCards();
+            }
+
+            // check for win here
+            if (checkWin())
+            {
+                MessageBox.Show("AI won!");
+            }
+
+            // eject card with min priority    
+            int minPriority = dealersHand.Min(c => c.priority);
+            Card minPriorityCard = null;
+            foreach (Card c in dealersHand)
+            {
+                if (c.priority == minPriority)
+                    minPriorityCard = c;
+            }
+            dealersHand.Remove(minPriorityCard);
+            sameSuitCards = new List<List<Card>>();
+            sameValueCards = new List<List<Card>>();
+
+            return minPriorityCard;
+        }
+
+        private bool checkWin()
+        {
+            int groupsOfThree = 0;
+            int groupsOfFour = 0;
+
+            foreach (List<Card> group in sameValueCards)
+            {
+                if (group.Count == 3)
+                {
+                    groupsOfThree++;
+                    continue;
+                }
+
+                if (group.Count == 4)
+                {
+                    groupsOfFour++;
+                    continue;
+                }
+            }
+
+            if (groupsOfThree == 2 && groupsOfFour == 1)
+            {
+                return true;
+            }
+
+            foreach (List<Card> group in sameSuitCards)
+            {
+                if (group.Count == 3 && GroupInNumericOrder(group))
+                {
+                    groupsOfThree++;
+                    continue;
+                }
+
+                if (group.Count == 4 && GroupInNumericOrder(group))
+                {
+                    groupsOfFour++;
+                    continue;
+                }
+            }
+
+            if (groupsOfThree == 2 && groupsOfFour == 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ShouldKeepTopTableCard()
+        {
+            if (topTableCard == null)
+            {
+                // have to take card from deck
+                return false;
+            }
+            // copy hand with current priorities, to check hand with top tabled 
+            List<Card> dealersHandCopy = dealersHand.ToList();
+
+            // check dealer's hand now if the top table card improves 
+            dealersHand.Add(topTableCard);
+            // clear groupings
+            sameSuitCards = new List<List<Card>>();
+            sameValueCards = new List<List<Card>>();
+            DissectHand();
+            AssignPrioritiesToCards();
+
+
+            // compare previous hand with new hand; determine if topTableCard has 'good' priority
+            int minPrioOld = dealersHandCopy.Min(c => c.priority);
+            int maxPrioOld = dealersHandCopy.Max(c => c.priority);
+
+            int oldMidPrio = (minPrioOld + maxPrioOld) / 2;
+
+            // keep the topTableCard in hand if it's priority is greater/equal oldMidPrio
+            if (topTableCard.priority < oldMidPrio)
+            {
+                // determine distance between oldMidPrio and topTableCard
+                int dist = Math.Abs(topTableCard.priority - oldMidPrio);
+                double distRatio = topTableCard.priority / dist;
+                if (distRatio > 0.5)
+                {
+                    return true;
+                }
+
+                // don't keep card if distRatio is not good (<= 0.5)
+                // in this case we also clear the temporary decision making hand and lists
+                //check for win incase
+                if (checkWin())
+                {
+                    MessageBox.Show("AI won!");
+                }
+
+                dealersHand.Remove(topTableCard);
+                sameSuitCards = new List<List<Card>>();
+                sameValueCards = new List<List<Card>>();
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void DissectHand()
@@ -114,6 +249,11 @@ namespace DadaGame
         // assign priorities to groups
         public void AssignPrioritiesToCards()
         {
+            // get rid of existing priorities
+            foreach (Card c in dealersHand)
+            {
+                c.priority = 0;
+            }
             // assign priorities for same value cards 
             foreach (List<Card> sameValueGroup in sameValueCards)
             {
@@ -211,19 +351,13 @@ namespace DadaGame
                     }
                 }
             }
-
-            // prioritize distance between cards; groups of 2 having smaller distance between cards value - higher priority than
-            // groups of 3/4 with large distances. greater distance, lower priority between cards
-
-            // group needs a particular card; if required card has been dealt before, forget the group; if not, determine its probability via 'card counting' + # of cards dealt for the suit
+            // Can be added in future: group needs a particular card - determine its probability via 'card counting'
+            // + # of cards dealt for the suit
 
             // single groups - priority  = 0
-
-
-
-            // check for overlapping cards between sameSuitCards and sameValueCards; *2 priority for each common card
         }
 
+        // function checks to see if the passed group is in numerical order
         private bool GroupInNumericOrder(List<Card> sameSuitGroup)
         {
             // ascending sort
